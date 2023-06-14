@@ -10,7 +10,7 @@ const db = mysql.createConnection({
   user: "root",
   // MySQL password here
   password: "",
-// MySQL database here
+  // MySQL database here
   database: "employee_db",
 });
 db.connect((err) => {
@@ -18,8 +18,9 @@ db.connect((err) => {
     console.error("ERROR: %s", err.message);
     return;
   }
-  
-//If the database connection is successful without any errors initiate the prompt
+
+  //If the database connection is successful without any errors initiate the prompt
+
   console.log(`\nSuccessfully connected to the employee_db database`);
   (async () => {
     while (true) {
@@ -27,10 +28,9 @@ db.connect((err) => {
     }
   })();
 });
- //Execute the function and initiate the prompt to display a list of options to the user
+//Execute the function and initiate the prompt to display a list of options to the user
 async function handleOptions() {
-  const departmentsChoices = await getDepartment();
-//List of options to the user
+  //List of options to the user
   const results = await inquirer.prompt([
     {
       type: "list",
@@ -52,7 +52,7 @@ async function handleOptions() {
       loop: false,
     },
   ]);
-//Execute the function based on the user's choice
+  //Execute the function based on the user's choice
   switch (results.command) {
     case "View All Departments":
       await displayTable("department");
@@ -135,29 +135,24 @@ async function deleteDepartment() {
       name: "department",
       message: "Which department do you want to delete?",
       //Show department by name using .map method
-      choices: departmentsChoices.map((department) => department.name),
-
+      choices: departmentsChoices,
     },
   ]);
-  //Save variable selected department by name
-  const department = departmentsChoices.find(
-    (department) => department.name === results.department
-  );
+  const department = results.department;
   //Delete from Database
   const sql = `DELETE FROM department WHERE id = ?`;
   const values = [department.id];
-  const deparmentDeleted = results.department;
 
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log(`Department ${deparmentDeleted} deleted successfully!`);
+    console.log(`Department ${department.name} deleted successfully!`);
   });
 }
 
-// Function Create a New Role 
+// Function Add a New Role
 async function createRole() {
   const departmentsChoices = await getDepartment();
   const results = await inquirer.prompt([
@@ -171,73 +166,52 @@ async function createRole() {
       type: "list",
       name: "department",
       message: "Which department does the role belong to?",
-      choices: departmentsChoices.map((department) => department.name),
-
+      choices: departmentsChoices,
     },
   ]);
-  //Save variable selected department by name
-  const department = departmentsChoices.find(
-    (department) => department.name === results.department
-  );
-//Insert to Database
+  //Insert to Database
   const sql = `INSERT INTO role (title, salary, department_id)
     VALUES (?, ?, ?)`;
-  const values = [results.title, results.salary, department.id];
-  const roleCreated = results.title;
+  const values = [results.title, results.salary, results.department.id];
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log(`Role ${roleCreated} added successfully!`);
+    console.log("Role added successfully!");
   });
 }
 
-// Function Delete selected role 
+// Function Delete selected role
 async function deleteRole() {
-  const roles = await getRoles();
-  const roleChoices = roles.map((role) => ({
-    name: role.title,
-    value: role.id,
-  }));
+  const roleChoices = await getRoles();
 
   const results = await inquirer.prompt([
     {
       type: "list",
-      name: "roleId",
+      name: "role",
       message: "Which role do you want to delete?",
       choices: roleChoices,
     },
   ]);
-//Delete from Database
+  const role = results.role;
+  //Delete from Database
   const sql = `DELETE FROM role WHERE id = ?`;
-  const values = [results.roleId];
-  const roleDeleted = roles.find((role) => role.id === results.roleId).title;
+  const values = [role.id];
 
- 
-   
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log(`Role ${roleDeleted} deleted successfully!`);
+    console.log(`Role ${role.title} deleted successfully!`);
   });
 }
 
 // Function Add New Employee
 async function createEmployee() {
-  const employees = await getEmployees();
-  const roles = await getRoles();
-  const employeeChoices = employees.map((employee) => ({
-    name: `${employee.first_name} ${employee.last_name}`,
-    value: employee.id,
-  }));
-
-  const roleChoices = roles.map((role) => ({
-    name: role.title,
-    value: role.id,
-  }));
+  const employeeChoices = await getEmployees();
+  const roleChoices = await getRoles();
 
   const results = await inquirer.prompt([
     {
@@ -263,7 +237,7 @@ async function createEmployee() {
       choices: employeeChoices,
     },
   ]);
-//Insert to Database
+  //Insert to Database
   const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES (?, ?, ?, ?)`;
   const values = [
@@ -273,17 +247,12 @@ async function createEmployee() {
     results.managerId,
   ];
 
-  const newEmployee = {
-    firstName: results.firstName,
-    lastName: results.lastName,
-    roleId: results.roleId,
-  };
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log(`Employee ${newEmployee. firstName} ${newEmployee.lastName} added successfully!`);
+    console.log("Employee added successfully!");
   });
 }
 
@@ -291,7 +260,7 @@ async function createEmployee() {
 async function updateEmployeeRole() {
   const employees = await getEmployees();
   const roles = await getRoles();
-//Save to variable employee first
+  //Save to variable employee first & last name using .map method
   const employeeChoices = employees.map((employee) => ({
     name: `${employee.first_name} ${employee.last_name}`,
     value: employee.id,
@@ -316,17 +285,16 @@ async function updateEmployeeRole() {
       choices: roleChoices,
     },
   ]);
-//Update Database
+  //Update Database
   const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
   const values = [results.roleId, results.employeeId];
-updatedEmployeeRole = results.employeeId;
+
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    //TODO updated employee
-    console.log(`Employee ${updatedEmployeeRole} role updated successfully!`);
+    console.log("Employee role updated successfully!");
   });
 }
 
@@ -375,12 +343,15 @@ async function getEmployees() {
 }
 async function getRoles() {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM role";
+    const sql = "SELECT id, title FROM role";
     db.query(sql, (err, rows) => {
       if (err) {
         reject(err);
       } else {
-        resolve(rows);
+        mapped = rows.map((role) => {
+          return { name: role.title, value: role };
+        });
+        resolve(mapped);
       }
     });
   });
@@ -388,15 +359,16 @@ async function getRoles() {
 
 async function getDepartment() {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM department";
+    const sql = "SELECT id, name FROM department";
     db.query(sql, (err, rows) => {
       if (err) {
         reject(err);
       } else {
-        resolve(rows);
+        mapped = rows.map((department) => {
+          return { name: department.name, value: department };
+        });
+        resolve(mapped);
       }
     });
   });
 }
-
-
