@@ -34,7 +34,7 @@ to be presented with the following options: view all departments, view all roles
 
 Screenshot located in `./assets/` folder
 
-![work-wiz](./assets/screenshot.png)
+![work-wiz](Assets/screenshot.png)
 
 ## Credits
  
