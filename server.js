@@ -10,7 +10,7 @@ const db = mysql.createConnection({
   user: "root",
   // MySQL password here
   password: "",
-// MySQL database here
+  // MySQL database here
   database: "employee_db",
 });
 db.connect((err) => {
@@ -18,8 +18,8 @@ db.connect((err) => {
     console.error("ERROR: %s", err.message);
     return;
   }
-  
-//If the database connection is successful without any errors initiate the prompt
+
+  //If the database connection is successful without any errors initiate the prompt
   console.log(`\nSuccessfully connected to the employee_db database`);
   (async () => {
     while (true) {
@@ -27,10 +27,10 @@ db.connect((err) => {
     }
   })();
 });
- //Execute the function and initiate the prompt to display a list of options to the user
+//Execute the function and initiate the prompt to display a list of options to the user
 async function handleOptions() {
   const departmentsChoices = await getDepartment();
-//List of options to the user
+  //List of options to the user
   const results = await inquirer.prompt([
     {
       type: "list",
@@ -52,7 +52,7 @@ async function handleOptions() {
       loop: false,
     },
   ]);
-//Execute the function based on the user's choice
+  //Execute the function based on the user's choice
   switch (results.command) {
     case "View All Departments":
       await displayTable("department");
@@ -136,7 +136,6 @@ async function deleteDepartment() {
       message: "Which department do you want to delete?",
       //Show department by name using .map method
       choices: departmentsChoices.map((department) => department.name),
-
     },
   ]);
   //Save variable selected department by name
@@ -157,7 +156,7 @@ async function deleteDepartment() {
   });
 }
 
-// Function Create a New Role 
+// Function Create a New Role
 async function createRole() {
   const departmentsChoices = await getDepartment();
   const results = await inquirer.prompt([
@@ -172,14 +171,13 @@ async function createRole() {
       name: "department",
       message: "Which department does the role belong to?",
       choices: departmentsChoices.map((department) => department.name),
-
     },
   ]);
   //Save variable selected department by name
   const department = departmentsChoices.find(
     (department) => department.name === results.department
   );
-//Insert to Database
+  //Insert to Database
   const sql = `INSERT INTO role (title, salary, department_id)
     VALUES (?, ?, ?)`;
   const values = [results.title, results.salary, department.id];
@@ -193,7 +191,7 @@ async function createRole() {
   });
 }
 
-// Function Delete selected role 
+// Function Delete selected role
 async function deleteRole() {
   const roles = await getRoles();
   const roleChoices = roles.map((role) => ({
@@ -209,13 +207,11 @@ async function deleteRole() {
       choices: roleChoices,
     },
   ]);
-//Delete from Database
+  //Delete from Database
   const sql = `DELETE FROM role WHERE id = ?`;
   const values = [results.roleId];
   const roleDeleted = roles.find((role) => role.id === results.roleId).title;
 
- 
-   
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
@@ -233,6 +229,7 @@ async function createEmployee() {
     name: `${employee.first_name} ${employee.last_name}`,
     value: employee.id,
   }));
+  employeeChoices.unshift({ name: 'None', value: null });
 
   const roleChoices = roles.map((role) => ({
     name: role.title,
@@ -263,7 +260,7 @@ async function createEmployee() {
       choices: employeeChoices,
     },
   ]);
-//Insert to Database
+  //Insert to Database
   const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES (?, ?, ?, ?)`;
   const values = [
@@ -283,7 +280,9 @@ async function createEmployee() {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log(`Employee ${newEmployee. firstName} ${newEmployee.lastName} added successfully!`);
+    console.log(
+      `Employee ${newEmployee.firstName} ${newEmployee.lastName} added successfully!`
+    );
   });
 }
 
@@ -291,11 +290,12 @@ async function createEmployee() {
 async function updateEmployeeRole() {
   const employees = await getEmployees();
   const roles = await getRoles();
-//Save to variable employee first
+  //Save to variable employee first
   const employeeChoices = employees.map((employee) => ({
     name: `${employee.first_name} ${employee.last_name}`,
     value: employee.id,
   }));
+
 
   const roleChoices = roles.map((role) => ({
     name: role.title,
@@ -316,24 +316,29 @@ async function updateEmployeeRole() {
       choices: roleChoices,
     },
   ]);
-//Update Database
+
+  const updatedEmployee = employees.find(
+    (employee) => employee.id === results.employeeId
+  );
+  //Update Database
   const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
   const values = [results.roleId, results.employeeId];
-updatedEmployeeRole = results.employeeId;
+
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
     //TODO updated employee
-    console.log(`Employee ${updatedEmployeeRole} role updated successfully!`);
+    console.log(
+      `Employee ${updatedEmployee.first_name} ${updatedEmployee.last_name}role updated successfully!`
+    );
   });
 }
 
 // Delete an employee from mysql
 async function deleteEmployee() {
   const employees = await getEmployees();
-  const roles = await getRoles();
 
   const employeeChoices = employees.map((employee) => ({
     name: `${employee.first_name} ${employee.last_name}`,
@@ -351,16 +356,21 @@ async function deleteEmployee() {
 
   const sql = `DELETE FROM employee WHERE id = ?`;
   const values = [results.employeeId];
+// Get the updated employee's details
+const deletedEmployee = employees.find(
+  (employee) => employee.id === results.employeeId
+);
 
   db.query(sql, values, (err, result) => {
     if (err) {
       console.log("ERROR: %s", err.message);
       return;
     }
-    console.log("Employee deleted successfully!");
+    console.log(`Employee ${deletedEmployee.first_name} ${deletedEmployee.last_name} deleted successfully!`);
   });
 }
 
+//Select All Employees function
 async function getEmployees() {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM employee";
@@ -371,8 +381,9 @@ async function getEmployees() {
         resolve(rows);
       }
     });
-  });
+  }); 
 }
+//Select All Roles Function
 async function getRoles() {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM role";
@@ -385,7 +396,7 @@ async function getRoles() {
     });
   });
 }
-
+//Select All Departsment function
 async function getDepartment() {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM department";
@@ -398,5 +409,3 @@ async function getDepartment() {
     });
   });
 }
-
-
