@@ -2,11 +2,11 @@
 
 ## Description
 
-Deployed application link on Heroku
-https://green-scribbles.herokuapp.com/
-
-Github link
+Deployed application link on GitHub
 https://github.com/itcreativeusa/work-wiz
+
+Youtube video guide
+https://youtu.be/gY1ECSYCs7s
 
 This is a WorkWiz employee tracker a command-line application that can be used to add, save & delete employees, roles and departments. Application uses Node.js, Inquirer, and MySQL to manage a company's employee database.
 
