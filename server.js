@@ -58,10 +58,12 @@ async function handleOptions() {
       await displayTable("department");
       break;
     case "View All Roles":
-      await displayTable("role");
+      // await displayTable("role");
+      await displayRoles();
       break;
     case "View All Employees":
-      await displayTable("employee");
+      //await displayTable("employee");
+      await displayEmployees();
       break;
     case "Add a Department":
       await createDepartment();
@@ -96,7 +98,7 @@ async function handleOptions() {
 
 //Show All the Departments function
 async function displayTable(table_name) {
-  const sql = `SELECT * FROM ${table_name}`;
+  const sql = `SELECT  * FROM ${table_name}`;
   db.query(sql, (err, rows) => {
     if (err) {
       console.log("ERROR: %s", err.message);
@@ -106,6 +108,47 @@ async function displayTable(table_name) {
     console.table(rows);
   });
 }
+//Show All the Departments function2
+async function displayTable2(table_name) {
+  const sql = `SELECT  * FROM ${table_name}`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log("ERROR: %s", err.message);
+      return;
+    }
+    console.log();
+    console.table(rows);
+  });
+}
+async function displayRoles() {
+  const sql = `SELECT r.id, r.title, r.salary, d.name as department ` +
+      `FROM role r JOIN department d on r.department_id = d.id`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log("ERROR: %s", err.message);
+      return;
+    }
+    console.log();
+    console.table(rows);
+  });
+}
+
+async function displayEmployees() {
+  const sql = `SELECT e.id, e.first_name, e.last_name, r.title as role, ` +
+      `CONCAT(m.first_name, ' ', m.last_name) as manager ` +
+      `FROM employee e ` +
+      `JOIN role r on e.role_id = r.id ` +
+      `LEFT JOIN employee m on e.manager_id = m.id`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log("ERROR: %s", err.message);
+      return;
+    }
+    console.log();
+    console.table(rows);
+  });
+}
+
 // Function create New Department based on the user's choice
 async function createDepartment() {
   const results = await inquirer.prompt([
@@ -329,7 +372,7 @@ async function updateEmployeeRole() {
       console.log("ERROR: %s", err.message);
       return;
     }
-    //TODO updated employee
+    //Updated employee saved
     console.log(
       `Employee ${updatedEmployee.first_name} ${updatedEmployee.last_name}role updated successfully!`
     );
@@ -373,7 +416,7 @@ const deletedEmployee = employees.find(
 //Select All Employees function
 async function getEmployees() {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM employee";
+    const sql = "SELECT  * FROM employee";
     db.query(sql, (err, rows) => {
       if (err) {
         reject(err);

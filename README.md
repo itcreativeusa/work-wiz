@@ -6,7 +6,7 @@ Deployed application link on GitHub
 https://github.com/itcreativeusa/work-wiz
 
 Youtube video guide
-https://youtu.be/bpegQy6vE14
+https://youtu.be/EFswqMyVQc8
 
 This is a WorkWiz employee tracker a command-line application that can be used to add, save & delete employees, roles and departments. Application uses Node.js, Inquirer, and MySQL to manage a company's employee database.
 
