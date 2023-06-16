@@ -39,6 +39,8 @@ Screenshot located in `./assets/` folder
 ## Credits
  
 Some code in file `server.js` was taken from Mini-Project provided by Berkeley Bootcamp for studying purposes.
+How to use SQL Aliases was found here
+`https://www.w3schools.com/sql/sql_alias.asp#:~:text=SQL%20aliases%20are%20used%20to,created%20with%20the%20AS%20keyword.`
 
 ## License
 
